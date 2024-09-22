@@ -10,8 +10,8 @@ services:
     volumes:
       - postgres_user_data:/var/lib/postgresql/data
       - ./init_db/user_db.sql:/docker-entrypoint-initdb.d/user_db.sql
-    networks:
-      - backend
+    # networks:
+    #   - backend
 
   # PostgreSQL for Chat Service
   postgres_chat_db_service:
@@ -22,8 +22,8 @@ services:
     volumes:
       - postgres_chat_data:/var/lib/postgresql/data
       - ./init_db/chat_db.sql:/docker-entrypoint-initdb.d/chat_db.sql
-    networks:
-      - backend
+    # networks:
+    #   - backend
 
   # PostgreSQL for Custom GPT Service
   postgres_gpt_db_service:
@@ -34,8 +34,8 @@ services:
     volumes:
       - postgres_gpt_data:/var/lib/postgresql/data
       - ./init_db/gpt_db.sql:/docker-entrypoint-initdb.d/gpt_db.sql
-    networks:
-      - backend
+    # networks:
+    #   - backend
 
   # PostgreSQL for Chat Memory Service
   postgres_chat_memory_service:
@@ -47,8 +47,8 @@ services:
       POSTGRES_PASSWORD: sunil
     volumes:
       - postgres_memory_data:/var/lib/postgresql/data
-    networks:
-      - backend
+    # networks:
+    #   - backend
 
                               ## Main Services
 
@@ -63,8 +63,8 @@ services:
       - "8000:8000"
     volumes:
       - ./user_service:/app
-    networks:
-      - backend
+    # networks:
+    #   - backend
     env_file:
       - ./user_service/.env
 
@@ -80,8 +80,8 @@ services:
       - "8001:8000"
     volumes:
       - ./chat_service:/app
-    networks:
-      - backend
+    # networks:
+    #   - backend
     env_file:
       - ./chat_service/.env
 
@@ -97,8 +97,8 @@ services:
       - "8002:8000"
     volumes:
       - ./custom_gpt_service:/app
-    networks:
-      - backend
+    # networks:
+    #   - backend
     env_file:
       - ./custom_gpt_service/.env
 
@@ -106,10 +106,14 @@ services:
     build:
       context: ./gateway
     container_name: api_gateway
+    depends_on:
+    - user_service
+    - chat_service
+    - custom_gpt_service
     ports:
       - "8003:8000"
-    networks:
-      - frontend
+    # networks:
+    #   - frontend
 
 volumes:
   postgres_user_data:
@@ -117,8 +121,8 @@ volumes:
   postgres_gpt_data:
   postgres_memory_data:
 
-networks:
-  backend:
-    driver: bridge
-  frontend:
-    driver: bridge
+# networks:
+#   backend:
+#     driver: bridge
+#   frontend:
+#     driver: bridge

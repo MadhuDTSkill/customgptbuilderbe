@@ -6,8 +6,8 @@ app = FastAPI()
 # Define a mapping between service names and their internal URLs
 SERVICE_URLS = {
     "user": "http://user_service:8000/api/users",
-    "chat": "http://chat_service:8001/api/chat",
-    "gpt": "http://custom_gpt_service:8002/api/custom_gpt"
+    "chat": "http://chat_service:8000/api/chat",
+    "gpt": "http://custom_gpt_service:8000/api/custom_gpt"
 }
 
 
