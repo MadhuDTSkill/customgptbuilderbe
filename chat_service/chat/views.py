@@ -31,7 +31,7 @@ class ChatView(views.APIView):
         gpt = self.queryset.get(id=gpt_id)        
         chat = Chat(gpt, user_id=request.user)
         response = chat.get_response(input)
-        return Response({'input' : input, 'response': response})
+        return Response(response)
 
 
 class MessagesListView(views.APIView):

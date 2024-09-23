@@ -6,8 +6,9 @@ from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 import os
 from chat.models import Message, CustomGPT
+from chat.serializers import MessageSerializer
 
-llm = ChatGroq(api_key= os.getenv('GROQ_API_KEY'), model = 'gemma2-9b-it')
+llm = ChatGroq(api_key= os.getenv('GROQ_API_KEY'), model = 'llama3-70b-8192')
 
 
 class Chat:
@@ -41,6 +42,7 @@ class Chat:
     def add_messages_to_table(self, user_message: str, ai_message: str):
         message = Message(custom_gpt = self.gpt, user_id = self.user_id, user_message = user_message, ai_message = ai_message)
         message.save()
+        return message
     
     
     def get_response(self, input: str) -> str:
@@ -50,5 +52,6 @@ class Chat:
                       })
         self.message_history.add_user_message(input)
         self.message_history.add_ai_message(response)
-        self.add_messages_to_table(input, response)
-        return response
+        message = self.add_messages_to_table(input, response)
+        message_data = MessageSerializer(message).data
+        return message_data

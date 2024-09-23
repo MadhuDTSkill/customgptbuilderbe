@@ -27,7 +27,6 @@ class UserLoginView(generics.GenericAPIView):
 
         if user and user.check_password(password):
             refresh = RefreshToken.for_user(user)
-            print(refresh)
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
@@ -54,3 +53,14 @@ class UserLogoutView(generics.GenericAPIView):
             return Response({'detail': 'Invalid refresh token'}, status=400)
         except Exception:
             return Response({'detail': 'Error occurred while logging out'}, status=500)
+
+class UserDetailsView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegisterSerializer
+    permission_classes = [IsUserIDAuthenticated]
+    
+    def get(self, request):
+        user = self.queryset.get(id=request.user)
+        user_data = self.serializer_class(user).data
+        return Response(user_data)
+    

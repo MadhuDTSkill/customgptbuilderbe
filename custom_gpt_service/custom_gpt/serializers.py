@@ -11,3 +11,7 @@ class CustomGPTJsonDataChatSerializer(serializers.Serializer):
     user_message = serializers.CharField()
     assistant_response = serializers.CharField()
     
+class CustomGPTTestChatSerializer(serializers.Serializer):
+    input = serializers.CharField()
+    system_prompt = serializers.CharField()
+    

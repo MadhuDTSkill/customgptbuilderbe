@@ -6,10 +6,10 @@ from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 import os, json, re
 
-llm = ChatGroq(api_key= os.getenv('GROQ_API_KEY'), model = 'gemma2-9b-it')
+llm = ChatGroq(api_key= os.getenv('GROQ_API_KEY'), model = 'llama3-70b-8192')
 
 custom_gpt_assist_system_prompt = """
-      You are a Custom GPT builder assistant. Your only task is to help users create a Custom GPT model by guiding them through a structured flow. Do not answer any unrelated questions. If the user asks anything that is not related to building the Custom GPT model, politely remind them that you are here to assist with the Custom GPT model creation only.
+      You are a Custom GPT builder assistant, Name MeowGPT. Your only task is to help users create a Custom GPT model by guiding them through a structured flow. Do not answer any unrelated questions. If the user asks anything that is not related to building the Custom GPT model, politely remind them that you are here to assist with the Custom GPT model creation only.
 
       Workflow:
         Introduction and Model Request:
@@ -46,7 +46,7 @@ custom_gpt_assist_system_prompt = """
       Handle Unrelated Questions:
       If the user asks unrelated questions (e.g., general knowledge, current events), do not provide answers. Politely remind the user to stay focused on building the Custom GPT model.
       Example user input: "Who is Naredra modi?"
-      Your response: "I am here to assist with building your Custom GPT model. Let’s focus on creating the best model for your needs. If you have any questions or need help with that, feel free to ask!"
+      Your response: "I am here to assist with building your Custom GPT model. Let's focus on creating the best model for your needs. If you have any questions or need help with that, feel free to ask!"
 """
 
 custom_gpt_assist_json_data_system_prompt = """You are an assistant designed to extract structured data from conversations, specifically a "name", "short description", and "system prompt" in the form of a text string. You must follow these rules:
@@ -86,10 +86,17 @@ custom_gpt_assist_json_data_system_prompt = """You are an assistant designed to 
 
 class Chat:
     
-    def __init__(self, user_id: str, is_assistant_chat=True):
-        self.system_prompt = custom_gpt_assist_system_prompt if is_assistant_chat else custom_gpt_assist_json_data_system_prompt
+    def __init__(self, user_id: str, is_assistant_chat=True, system_prompt = None):
+        self.system_prompt = system_prompt
+        if not self.system_prompt:
+            self.system_prompt = custom_gpt_assist_system_prompt if is_assistant_chat else custom_gpt_assist_json_data_system_prompt
+        else:
+            self.system_prompt = system_prompt
         self.is_assistant_chat = is_assistant_chat
-        self.session_id = 'custom_gpt_assist' if is_assistant_chat else 'custom_gpt_assist_json_data'
+        if not self.system_prompt:
+            self.session_id = 'custom_gpt_assist' if is_assistant_chat else 'custom_gpt_assist_json_data'
+        else:
+            self.session_id = 'custom_gpt_test'
         self.user_id = user_id
         self.message_history = self.get_session_history()
         self.qa_prompt = ChatPromptTemplate.from_messages(
@@ -100,7 +107,6 @@ class Chat:
             ]
         )
         self.question_answer_chain = self.qa_prompt | llm | StrOutputParser()
-
         self.conversational_rag_chain = RunnableWithMessageHistory(
             self.question_answer_chain,
             self.get_session_history,

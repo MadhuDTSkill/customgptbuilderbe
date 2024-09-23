@@ -1,9 +1,24 @@
 from fastapi import FastAPI, Request, HTTPException, Response
+from fastapi.middleware.cors import CORSMiddleware
 import requests
 
 app = FastAPI()
 
-# Define a mapping between service names and their internal URLs
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost:8080"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PATCH", "DELETE"],
+    allow_headers=["*"],
+)
+
+
 SERVICE_URLS = {
     "user": "http://user_service:8000/api/users",
     "chat": "http://chat_service:8000/api/chat",
